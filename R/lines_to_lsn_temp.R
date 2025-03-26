@@ -4,7 +4,7 @@
 #'   topological data model of streams/rivers represented as a
 #'   directional graph embedded in 2-D geographic space. Relationship
 #'   tables are created and topological relationships are checked.
-#' @param streams An `sf` object with LINESTING geometry
+#' @param streams An `sf` object with LINESTRING geometry
 #'   representing streams.
 #' @param lsn_path Pathname to a directory in character format specifying
 #'   where to store the outputs. The directory will be created if it

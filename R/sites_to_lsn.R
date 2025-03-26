@@ -8,7 +8,7 @@
 #'   topological location relative to other features in the LSN.
 #' @param sites An `sf` object with POINT geometry, typically
 #'   representing observed data or prediction locations.
-#' @param edges An `sf` object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTRING geometry created
 #'   using \code{\link{lines_to_lsn}}.
 #' @param snap_tolerance Numeric distance in map units >= 0. Sites that
 #'   are <= this distance from an edge feature will snapped to the

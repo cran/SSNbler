@@ -1,7 +1,7 @@
 #' @title Calculate the additive function value for edges in a LSN
 #' @description Calculate the additive function value for each edge
 #'   feature in a Landscape Network (LSN)
-#' @param edges An `sf` object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTRING geometry created
 #'   using \code{\link{lines_to_lsn}}.
 #' @param lsn_path Local pathname to a directory in character format
 #'   specifying where relationships.csv resides, which is created
@@ -119,11 +119,12 @@
 #'
 afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
                       save_local = TRUE, overwrite = TRUE) {
+
   # check sf object
   if (!inherits(edges, "sf")) {
     stop("edges must be an sf object.", call. = FALSE)
   }
-
+  
   ## Check inputs -------------------------------------------------
   ## Check geometry type
   edge_geom <- st_as_text(st_geometry(edges)[[1]])
@@ -139,24 +140,6 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
   if (!overwrite & save_local & file.exists(paste0(lsn_path, "/edges.gpkg"))) {
     stop("Cannot save edges to local file because edges.gpkg already exists in lsn_path and overwrite = FALSE")
   }
-
-  # ## Does segpi_col already exist in edges
-  # if(overwrite == FALSE & sum(colnames(edges) == segpi_col) > 0) {
-  #   stop(paste0(segpi_col, " already exists in edges and overwrite = FALSE"))
-  # } else {
-  #   edges[, segpi_col]<- NULL
-  # }
-  #
-  # ## Does afv_col already exist in edges when overwrite = FALSE
-  # if(overwrite == FALSE & afv_col %in% names(edges)) {
-  #   stop(paste0(afv_col, " already exists in edges and overwrite is FALSE."))
-  # } else {
-  #   edges[, afv_col]<- NULL
-  # }
-  #
-  # ## Check for duplicate names
-  # check_names_case_add(names(edges), segpi_col, "edges", "segpi_col")
-  # check_names_case_add(names(edges), afv_col, "edges", "afv_col")
 
   ## If segpi_col file exists and overwrite is TRUE
   if (segpi_col %in% colnames(edges)) {
@@ -188,7 +171,6 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
   }
   check_names_case(names(edges), "fid", "edges")
 
-
   ## Check infl_col column
   if (!infl_col %in% colnames(edges)) {
     stop(paste0(infl_col, " not found in edges"))
@@ -200,7 +182,14 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
   }
   ind <- st_drop_geometry(edges[, infl_col]) == 0
   sum.zeros <- sum(ind)
-
+  
+  ## Read in relationsips table
+  relate_table <- read.csv(paste0(lsn_path, "/relationships.csv"))
+  
+  ## Check for downstream divergences
+  if(sum(duplicated(relate_table$fromedge)) > 0) {
+  	stop("At least one downstream divergence is present in edges. Fix topology errors and re-create error free edges using lines_to_lsn().")
+  }
 
   ## calculate segment proportional infuence column
   edges <- get_segment_pi(
@@ -211,8 +200,7 @@ afv_edges <- function(edges, lsn_path, infl_col, segpi_col, afv_col,
 
   ## Format input data
   edges_sf <- edges[, c(segpi_col, "rid")]
-  relate_table <- read.csv(paste0(lsn_path, "/relationships.csv"))
-
+  
   ## Find the outlet segment(s)
   outlet <- identify_outlet_segment(relate_table, edges_sf)
   n_outlets <- length(outlet) ## number of outlets is the same as the number of networks

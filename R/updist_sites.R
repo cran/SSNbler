@@ -3,7 +3,7 @@
 #' @param sites A named list of one or more `sf` objects with
 #'   POINT geometry that have been snapped to the LSN using
 #'   \code{\link[SSNbler]{sites_to_lsn}}.
-#' @param edges An `sf` object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTRING geometry created
 #'   using \code{\link{lines_to_lsn}} and
 #'   \code{link[SSNbler]{updist_edges}}.
 #' @param length_col The name of the column in \code{edges} that
@@ -17,9 +17,8 @@
 #'   created using \code{link[SSNbler]{lines_to_lsn}}. Must be
 #'   specified if \code{save_local = TRUE}.
 #' @param overwrite A logical indicating whether results should be
-#'   overwritten if the upDist column already exists in \code{sites}
-#'   or sites.gpkg already exists in \code{lsn_path} and
-#'   \code{save_local = TRUE}. Default = TRUE.
+#'   overwritten if the upDist or \code{length_col} columns already exist in \code{sites}
+#'   or sites.gpkg already exists in \code{lsn_path}. Default = TRUE.
 #'
 #' #' @details \code{updist_sites()} calculates the total hydrologic distance from
 #'   each observed or prediction point feature to
@@ -35,7 +34,7 @@
 #' calculate the pairwise hydrologic distances used to fit spatial
 #' stream network models in the 'SSN2' package. Do not modify the name
 #' of the column in any way or the values the \code{upDist} column
-#' contains.
+#' contains. If the \code{upDist} or \code{length_col} columns already exist in \code{sites} and \code{overwrite = TRUE}, the columns will be deleted from all \code{sites}., 
 #'
 #' @return One or more `sf` object(s) with all the original
 #'   data from \code{sites}, along with a new \code{upDist} column in
@@ -112,6 +111,7 @@
 #'
 updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
                          overwrite = TRUE) {
+
   # check sf object
   if (any(vapply(sites, function(x) !inherits(x, "sf"), logical(1)))) {
     stop("All sites objects must be sf objects.", call. = FALSE)
@@ -171,37 +171,55 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
     sites_i_name <- names(sites)[i]
     sites_i_sf <- sites[[i]]
 
-
-
     ## Check if upDist column already exists and overwrite is FALSE
     ## If so, skip this iteration in the loop
     if ("upDist" %in% names(sites_i_sf) & !overwrite) {
-      message(
-        "A column called 'upDist' already exists in", sites_i_name,
-        "and overwrite is set to FALSE. This set of sites will be skipped."
-      )
-      next
+      
+      if(length(n_sites) > 1){
+          message(
+            "A column called 'upDist' already exists in ", sites_i_name,
+            " and overwrite is set to FALSE. This set of sites will be skipped."
+          )
+          next
+      } else {
+          stop(paste0("A column called 'upDist' already exists in ", sites_i_name,
+               " and overwrite is set to FALSE."))
+      }
+    }
+    
+    ## Check if length_col column already exists and overwrite is FALSE
+    ## If so, skip this iteration in the loop
+    if (length_col %in% names(sites_i_sf) & !overwrite) {
+      stop(paste0(
+        "A column called '", length_col, "' already exists in ", sites_i_name,
+        " and overwrite = FALSE. Rename or delete '", length_col,
+        "' or set overwrite = TRUE. Setting overwrite = TRUE will remove '",
+        length_col, "' column from all sites."))
+
     }
 
-    # ## Remove the upDist column if it exists before the join with edges
-    # if("upDist" %in% names(sites_i_sf) & overwrite) {
-    #   ## ind<- colnames(sites_i_sf) == "upDist"
-    #   ## sites_i_sf <- sites_i_sf[, !ind]
-    #
-    #   sites_i_sf$upDist <- NULL
-    # }
-    #
-    # ## Check for duplicate names
-    # check_names_case(names(sites_i_sf), "upDist", sites_i_name)
-
-    ## If upDist file exists and overwrite is TRUE
+    ## If upDist column exists and overwrite is TRUE
     if ("upDist" %in% colnames(sites_i_sf)) {
       if (overwrite) {
         sites_i_sf$upDist <- NULL
       } else {
-        stop(paste0("upDist already exists in ", sites_i_sf, " and and overwrite = FALSE"), call. = FALSE)
+        stop(paste0("upDist already exists in ", sites_i_sf, 
+                    " and and overwrite = FALSE"), call. = FALSE)
       }
     }
+    
+    ## Remove length_col column if it exists and overwrite is TRUE
+    if (length_col %in% colnames(sites_i_sf)) {
+      if (overwrite) {
+        sites_i_sf[,length_col] <- NULL
+      } else {
+        stop(paste0(length_col, " already exists in ", sites_i_sf, 
+                    " and and overwrite = FALSE"), call. = FALSE)
+      }
+    }
+    
+    
+    
     check_names_case(names(sites_i_sf), "upDist", sites_i_name)
 
     ## If fid file exists and overwrite is TRUE
@@ -216,6 +234,7 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
 
     ## Get the Length and upDist fields from the edges
     sites_i_sf <- merge(sites_i_sf, edges, by = "rid", all.x = TRUE)
+    
     ## Compute the new upDist for sites based on the ratio, updist and length of edge
     sites_i_sf$upDist <- sites_i_sf[, "uDist", drop = TRUE] -
       sites_i_sf[, length_col, drop = TRUE] +
@@ -223,11 +242,11 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
     ## Remove uDist and length column from edges
     ind <- colnames(sites_i_sf) %in% c("uDist", length_col)
     sites_i_sf <- sites_i_sf[, !ind]
-
+    
     if (save_local == TRUE) {
       ## Write out the result
       write_sf(sites_i_sf, paste0(lsn_path, "/", sites_i_name, ".gpkg"),
-        delete_layer = overwrite
+        delete_layer = TRUE  ## Set to true for case when it doesn't already exist
       )
     }
 
@@ -236,8 +255,10 @@ updist_sites <- function(sites, edges, length_col, lsn_path, save_local = TRUE,
 
   ## Add names out out_sites list
   names(out_sites) <- names(sites)
+  
+  ##message("\nFINISHED updist_sites script successfully\n")
 
   return(out_sites)
 
-  message("\nFINISHED updist_sites script successfully\n")
+  
 }

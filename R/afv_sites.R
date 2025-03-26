@@ -3,7 +3,7 @@
 #' @param sites A named list of one or more `sf` objects with
 #'   POINT geometry that have been snapped to the LSN using
 #'   \code{\link[SSNbler]{sites_to_lsn}}.
-#' @param edges `sf` object with LINESTING geometry created
+#' @param edges `sf` object with LINESTRING geometry created
 #'   using \code{\link{lines_to_lsn}}.
 #' @param afv_col Name of the column in \code{edges} containing
 #'   the additive function value for each feature, in character
@@ -211,11 +211,16 @@ afv_sites <- function(sites, edges, afv_col, save_local = TRUE,
 
     if (afv_col %in% names(sites_i)) {
       if (overwrite == FALSE) {
-        message(
-          "A column called", afv_col, "already exists in", names(sites)[i],
-          "and overwrite is set to FALSE. Skipping this set of sites."
-        )
-        next ## skip to next iteration after message
+
+        if(n_sites > 1) {
+           message(
+            "A column called ", afv_col, " already exists in ", names(sites)[i],
+            " and overwrite is set to FALSE. Skipping this set of sites.")
+          next ## skip to next iteration after message
+        } else {
+          stop(paste0("A column called ", afv_col, " already exists in ", 
+                      names(sites)[i]," and overwrite is set to FALSE."))
+        }
       } else {
         ind <- colnames(sites_i) == afv_col
         sites_i <- sites_i[, !ind]

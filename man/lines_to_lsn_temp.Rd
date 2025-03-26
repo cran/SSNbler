@@ -16,7 +16,7 @@ lines_to_lsn_temp(
 )
 }
 \arguments{
-\item{streams}{An \code{sf} object with LINESTING geometry
+\item{streams}{An \code{sf} object with LINESTRING geometry
 representing streams.}
 
 \item{lsn_path}{Pathname to a directory in character format specifying

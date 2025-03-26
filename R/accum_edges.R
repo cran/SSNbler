@@ -2,7 +2,7 @@
 #' @description Accumulate (sum) edge values downstream in a
 #'   Landscape Network (LSN)
 #'
-#' @param edges An `sf` object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTRING geometry created
 #'   using \code{\link{lines_to_lsn}}.
 #' @param lsn_path Local pathname to a directory in character format
 #'   specifying where relationships.csv resides, which is created
@@ -85,17 +85,13 @@ accum_edges <- function(edges, lsn_path, sum_col, acc_col,
     stop("Input edges must have LINESTRING geometry")
   }
 
-  ## Make sure geometry column is named geometry rather than geom
-  ## if(!"geometry" %in% colnames(edges)) {
-  ##   edges <- st_geometry(edges, rename = "geometry")
-  ## }
-
   ## Check lsn_path exists
   if (!file.exists(lsn_path)) {
     stop("\n lsn_path does not exist.\n\n")
   }
   ## Can we overwrite edges.gpkg if necessary
-  if (overwrite == FALSE & save_local == TRUE & file.exists(paste0(lsn_path, "/edges.gpkg"))) {
+  if (overwrite == FALSE & save_local == TRUE & 
+  		file.exists(paste0(lsn_path, "/edges.gpkg"))) {
     stop("edges.gpkg already exists in lsn_path and overwrite = FALSE")
   }
   ## Delete acc_col column if necessary
@@ -107,11 +103,6 @@ accum_edges <- function(edges, lsn_path, sum_col, acc_col,
       edges <- edges[, !ind]
     }
   }
-
-  # ## Does sum_col exist
-  # if(sum(colnames(edges) == sum_col) == 0) {
-  #   stop(paste0(sum_col," not found in edges"))
-  # }
 
   ## If acc_col file exists and overwrite is TRUE
   if (acc_col %in% colnames(edges)) {
@@ -141,6 +132,11 @@ accum_edges <- function(edges, lsn_path, sum_col, acc_col,
   if (verbose == TRUE) message("\n\nImporting relationships.csv table")
   relate_table <- paste0(lsn_path, "/relationships.csv")
   rel <- read.csv(relate_table)
+  
+  ## Check for downstream divergences
+  if(sum(duplicated(rel$fromedge)) > 0) {
+  	stop("At least one downstream divergence is present in edges. Fix topology errors and re-create error free edges using lines_to_lsn().")
+  }
 
   ## Get vector of rid values for outlet outlet segment(s)
   if (verbose == TRUE) message("\nIdentifying outlet segments\n")

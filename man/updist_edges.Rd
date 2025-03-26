@@ -15,7 +15,7 @@ updist_edges(
 )
 }
 \arguments{
-\item{edges}{An \code{sf} object with LINESTING geometry created
+\item{edges}{An \code{sf} object with LINESTRING geometry created
 using \code{\link{lines_to_lsn}}.}
 
 \item{lsn_path}{Local pathname to a directory in character format

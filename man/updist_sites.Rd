@@ -18,7 +18,7 @@ updist_sites(
 POINT geometry that have been snapped to the LSN using
 \code{\link[SSNbler]{sites_to_lsn}}.}
 
-\item{edges}{An \code{sf} object with LINESTING geometry created
+\item{edges}{An \code{sf} object with LINESTRING geometry created
 using \code{\link{lines_to_lsn}} and
 \code{link[SSNbler]{updist_edges}}.}
 
@@ -36,9 +36,8 @@ format. File basenames are taken from the names assigned to the
 \code{sites} list. Default is \code{TRUE}.}
 
 \item{overwrite}{A logical indicating whether results should be
-overwritten if the upDist column already exists in \code{sites}
-or sites.gpkg already exists in \code{lsn_path} and
-\code{save_local = TRUE}. Default = TRUE.
+overwritten if the upDist or \code{length_col} columns already exist in \code{sites}
+or sites.gpkg already exists in \code{lsn_path}. Default = TRUE.
 
 #' @details \code{updist_sites()} calculates the total hydrologic distance from
 each observed or prediction point feature to
@@ -54,7 +53,7 @@ The upstream distances stored in \code{upDist} are used to
 calculate the pairwise hydrologic distances used to fit spatial
 stream network models in the 'SSN2' package. Do not modify the name
 of the column in any way or the values the \code{upDist} column
-contains.}
+contains. If the \code{upDist} or \code{length_col} columns already exist in \code{sites} and \code{overwrite = TRUE}, the columns will be deleted from all \code{sites}.,}
 }
 \value{
 One or more \code{sf} object(s) with all the original

@@ -374,7 +374,7 @@ topologically corrected LSN containing edges, observed sites, and
 prediction sites (optional). This LSN provides the foundation for all
 of the remaining spatial data processing steps and the spatial
 statistical models. Creating the LSN is often the most time-consuming
-step in the spatial statistical modelling workflow, especially if the
+step in the spatial statistical modeling workflow, especially if the
 edges or sites contain a large number of features or the stream
 network has many topological errors. However, it is critical that the
 spatial and topological relationships are accurately represented in
@@ -401,7 +401,7 @@ prefer not to save results locally.
 | prediction sites (optional) | sf object, `POINT` geometry      | GeoPackage              |
 | nodes                       |                                  | GeoPackage              |
 | nodexy table                |                                  | csv file                |
-| noderelationship table      |                                  | csv file                |
+| noderelationships table     |                                  | csv file                |
 | relationships table         |                                  | csv file                |
 
 Table: LSN components are stored in memory as `sf` objects and also in a
@@ -725,7 +725,7 @@ throughout the network, and simulate data at those locations using the
 The `path` element provides a critical link between the `.ssn`
 directory and the `SSN` object stored in R. This is important because
 the 'SSN2' package reads and writes data to this directory during the
-spatial stream-network modelling workflow.
+spatial stream-network modeling workflow.
 
 The `ssn_assemble` function also adds several important columns to the edges, obs, and
 prediction datasets.
@@ -815,7 +815,7 @@ in an `SSN` object can be accessed just like an element in any named
 list. In this example, the edges and observed sites are accessed using
 calls to `mf04_ssn$edges` and `mf04_ssn$obs`, respectively. The
 prediction sites are accessed a bit differently
-(e.g. `mf04_ssn$preds$pred1km`) because `preds` is itself a named
+(e.g.,`mf04_ssn$preds$pred1km`) because `preds` is itself a named
 list.
 
 Users often want to incorporate additional data into the edges,
@@ -827,7 +827,7 @@ segment characteristics in the conterminous US. It
 is relatively easy to join these and other data to the `sf` objects in **R**
 before or after the `SSN` object is assembled. An online search
 will show there are numerous functions available for joining an `sf`
-object to a variety of data formats (e.g. `data.frames`, `tibbles`,
+object to a variety of data formats (e.g.,`data.frames`, `tibbles`,
 `vectors`, `sp` objects). However, if the result of the join is not an
 `sf` object, it must be converted to one before running additional
 functions in 'SSNbler' and 'SSN2' (see `st_as_sf` in the 'sf'
@@ -840,7 +840,7 @@ package).
 We can now use the mf04_ssn object to fit a spatial stream-network model relating mean summer temperature to elevation (`ELEV_DEM`) and mean annual precipitation (`AREAWTMAP`), with the exponential tail-up, spherical tail-down, and Gaussian Euclidean covariance functions. Notice that `additive = "afvArea"`, which is the column we created earlier using
 the `afv_edges` and `afv_sites` functions.
 
-```{r SSN2_modelling}
+```{r SSN2_modeling}
 library(SSN2)
 
 ## Generate hydrologic distance matrices

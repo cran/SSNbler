@@ -18,7 +18,7 @@ afv_sites(
 POINT geometry that have been snapped to the LSN using
 \code{\link[SSNbler]{sites_to_lsn}}.}
 
-\item{edges}{\code{sf} object with LINESTING geometry created
+\item{edges}{\code{sf} object with LINESTRING geometry created
 using \code{\link{lines_to_lsn}}.}
 
 \item{afv_col}{Name of the column in \code{edges} containing

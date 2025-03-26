@@ -13,6 +13,9 @@
 #' @importFrom RSQLite dbConnect dbDisconnect dbExistsTable dbListTables dbReadTable dbRemoveTable dbWriteTable SQLite
 #' @importFrom withr local_dir
 #' @importFrom SSN2 copy_lsn_to_temp create_netgeom ssn_get_netgeom ssn_import
+#' @importFrom parallel detectCores makeCluster stopCluster
+#' @importFrom doParallel registerDoParallel
+#' @import foreach
 ## usethis namespace: start
 ## usethis namespace: end
 NULL

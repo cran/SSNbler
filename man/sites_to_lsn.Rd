@@ -19,7 +19,7 @@ sites_to_lsn(
 \item{sites}{An \code{sf} object with POINT geometry, typically
 representing observed data or prediction locations.}
 
-\item{edges}{An \code{sf} object with LINESTING geometry created
+\item{edges}{An \code{sf} object with LINESTRING geometry created
 using \code{\link{lines_to_lsn}}.}
 
 \item{snap_tolerance}{Numeric distance in map units >= 0. Sites that

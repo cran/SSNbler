@@ -12,11 +12,13 @@ lines_to_lsn(
   topo_tolerance = 0,
   remove_ZM = FALSE,
   overwrite = FALSE,
+  use_parallel = FALSE,
+  no_cores = NULL,
   verbose = TRUE
 )
 }
 \arguments{
-\item{streams}{An \code{sf} object with LINESTING geometry
+\item{streams}{An \code{sf} object with LINESTRING geometry
 representing streams.}
 
 \item{lsn_path}{Pathname to a directory in character format specifying
@@ -45,6 +47,10 @@ removed from streams, if they exist. Default is \code{FALSE}.}
 overwrite existing files with the same names. If \code{FALSE} and
 files sharing the same names as the outputs exist in the
 \code{lsn_path}, the function will exit early with an error.}
+
+\item{use_parallel}{Logical. if \code{TRUE} parallel processing will be used. Default is \code{FALSE}.}
+
+\item{no_cores}{Integer representing the number of cores used when \code{use_parallel = TRUE}.}
 
 \item{verbose}{Logical. If \code{TRUE}, messages describing
 function progress will be printed to the console. Default is
@@ -112,5 +118,5 @@ are automatically snapped when \code{check_topology = TRUE}.  When
 (snap_tolerance/10000) <= distance <= snap_tolerance, the nodes are
 not snapped and are instead flagged as potential errors for the
 user to check and correct. Similarly, when snap_tolerance < distance <=
-topo_tolerance, nodes are flagged as potential errors.
+topo_tolerance, nodes are flagged as potential errors. Note that \code{snap_tolerance} must always be < the length of the shortest line feature found in \code{streams}. Use the \code{\link[sf]{st_length}} to obtain and check the length of each line feature.
 }

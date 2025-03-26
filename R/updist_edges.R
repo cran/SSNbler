@@ -3,7 +3,7 @@
 #'   (i.e. the most downstream location on the stream network) to the
 #'   upstream node of each edge feature (i.e. upstream distance) in
 #'   the Landscape Network (LSN)
-#' @param edges An `sf` object with LINESTING geometry created
+#' @param edges An `sf` object with LINESTRING geometry created
 #'   using \code{\link{lines_to_lsn}}.
 #' @param lsn_path Local pathname to a directory in character format
 #'   specifying where relationships.csv resides, which is created
@@ -185,6 +185,11 @@ updist_edges <- function(edges, lsn_path = NULL, calc_length = FALSE, length_col
   ## Import relationship table
   if (verbose == TRUE) message("\n\nImporting relationships.csv table")
   rel <- read.csv(relate_table)
+  
+  ## Check for downstream divergences
+  if(sum(duplicated(rel$fromedge)) > 0) {
+  	stop("At least one downstream divergence is present in edges. Fix topology errors and re-create error free edges using lines_to_lsn().")
+  }
 
   ## Get vector of rid values for outlet segment(s)
   if (verbose == TRUE) message("\nIdentifying outlet segments\n")
